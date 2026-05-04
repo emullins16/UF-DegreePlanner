@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UF Course Prerequisite Tree Viewer</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #c3ddff 0%, #ffe2c3 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+        }
+        header {
+            background: linear-gradient(90deg, #9ec8ff 0%, #ffd4a8 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        .main-content {
+            display: flex;
+            min-height: 600px;
+        }
+        .sidebar {
+            width: 350px;
+            background: #f8f9fa;
+            padding: 25px;
+            border-right: 2px solid #dee2e6;
+            overflow-y: auto;
+            max-height: 80vh;
+            transition: all 0.3s ease;
+        }
+        .sidebar.hidden {
+            display: none;
+        }
+        .content {
+            flex: 1;
+            padding: 30px;
+            overflow: auto;
+            max-height: 80vh;
+        }
+        .search-section {
+            margin-bottom: 25px;
+        }
+        .search-section label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #0021A5;
+        }
+        .search-section input,
+        .search-section select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        .search-section input:focus,
+        .search-section select:focus {
+            outline: none;
+            border-color: #0021A5;
+        }
+        .degree-buttons {
+            margin-bottom: 25px;
+        }
+        .degree-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 10px;
+            background: white;
+            border: 2px solid #0021A5;
+            border-radius: 8px;
+            color: #0021A5;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .degree-btn:hover {
+            background: #0021A5;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 33, 165, 0.3);
+        }
+        .course-list {
+            list-style: none;
+        }
+        .course-item {
+            padding: 12px;
+            margin-bottom: 8px;
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .course-item:hover {
+            background: #0021A5;
+            color: white;
+            transform: translateX(5px);
+            box-shadow: 0 2px 8px rgba(0, 33, 165, 0.2);
+        }
+        .course-item.selected {
+            background: #0021A5;
+            color: white;
+            border-color: #001a7a;
+            box-shadow: 0 4px 12px rgba(0, 33, 165, 0.4);
+        }
+        .course-code {
+            font-weight: 700;
+            display: block;
+            margin-bottom: 4px;
+        }
+        #degree-panel-content.hidden {
+            display: none;
+        }
+        .course-name {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+        #tree-container {
+            width: 100%;
+            height: 500px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            background: #f8f9fa;
+            overflow: auto;
+            position: relative;
+        }
+        #tree-container svg {
+            cursor: grab;
+            display: block;
+        }
+        #tree-container svg:active {
+            cursor: grabbing;
+        }
+        .zoom-controls {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 5px;
+            z-index: 10;
+        }
+        .zoom-btn {
+            width: 35px;
+            height: 35px;
+            background: white;
+            border: 2px solid #0021A5;
+            border-radius: 6px;
+            color: #0021A5;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        .zoom-btn:hover {
+            background: #0021A5;
+            color: white;
+        }
+        .tree-stats {
+            background: #e7f3ff;
+            border-left: 4px solid #0021A5;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 6px;
+        }
+        .tree-stats h3 {
+            color: #0021A5;
+            margin-bottom: 10px;
+        }
+        .stat-item {
+            display: inline-block;
+            margin-right: 20px;
+            padding: 8px 15px;
+            background: white;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+        .stat-label {
+            font-weight: 600;
+            color: #0021A5;
+        }
+        .legend {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            border: 2px solid #dee2e6;
+            flex-wrap: wrap;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+        .node {
+            cursor: pointer;
+        }
+        .node circle {
+            fill: #FA4616;
+            stroke: #0021A5;
+            stroke-width: 2px;
+        }
+        .node.foundation circle {
+            fill: #28a745;
+        }
+        .node.circular circle {
+            fill: #dc3545;
+        }
+        .node.missing circle {
+            fill: #ffc107;
+        }
+        .node.duplicate circle {
+            fill: #6f42c1;
+        }
+        .node text {
+            font-size: 12px;
+            font-weight: 600;
+            pointer-events: none;
+        }
+        .link {
+            fill: none;
+            stroke: #0021A5;
+            stroke-width: 2px;
+        }
+        #tree-container.fullscreen,
+        #degree-tree-root.fullscreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw !important;
+            height: 100vh !important;
+            z-index: 9999;
+            padding: 20px;
+            background: white;
+            border-radius: 0;
+        }
+        #tree-container.fullscreen svg,
+        #degree-tree-root.fullscreen svg {
+            width: 100% !important;
+            height: 100% !important;
+        }
+        .transform-info {
+            align-items: center;
+            display: inline-flex;
+            gap: 6px;
+            padding: 0 10px;
+            font-size: 12px;
+            color: #0021A5;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            background: rgba(255,255,255,0.92);
+        }
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+            font-size: 1.2em;
+        }
+        .zoom-hint {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background: rgba(0, 33, 165, 0.9);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 6px;
+            font-size: 12px;
+            z-index: 10;
+        }
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                max-height: none;
+            }
+            
+            header h1 {
+                font-size: 1.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🐊 UF Course Prerequisite Tree Viewer</h1>
+            <p>Visualize course dependencies with interactive D3.js trees</p>
+        </header>
+        <div class="main-content">
+            <div class="sidebar">
+                <button id="toggle-sidebar" class="zoom-btn" style="margin-bottom:20px; width:100%;">Hide Sidebar</button>
+                <div class="search-section">
+                    <label for="search">Search Courses</label>
+                    <input type="text" id="search" placeholder="Enter course code or name...">
+                </div>
+                <div class="search-section">
+                    <label for="department">Filter by Department</label>
+                    <select id="department">
+                        <option value="">All Departments</option>
+                    </select>
+                </div>
+                <div class="degree-buttons">
+                    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:15px; gap:10px;">
+                        <h3 style="margin:0; color:#0021A5;">Degree Templates</h3>
+                        <button id="toggle-degree-panel" class="zoom-btn" style="padding: 8px 12px; font-size: 0.95em; min-width: 80px;">Hide</button>
+                    </div>
+                    <div id="degree-panel-content">
+                        <div id="degree-buttons-container"></div>
+                    </div>
+                </div>
+                <div id="course-selection-area">
+                    <div class="search-section" id="selected-courses-panel" style="display:none; margin-bottom:20px;">
+                        <label>Selected Courses</label>
+                        <div id="selected-courses-list" style="min-height: 40px; padding: 12px; border: 2px solid #dee2e6; border-radius: 8px; background:white;"></div>
+                        <div style="display:flex; gap:10px; margin-top:12px;">
+                            <button id="show-selected-btn" class="degree-btn" style="flex:1;">Show Selected</button>
+                            <button id="clear-selection-btn" class="degree-btn" style="flex:1; background:#dc3545; color:white; border-color:#dc3545;">Clear</button>
+                        </div>
+                    </div>
+                    <div id="course-list-wrapper">
+                        <h3 style="margin-bottom: 15px; color: #0021A5;">Course List</h3>
+                        <ul id="course-list" class="course-list"></ul>
+                    </div>
+                </div>
+            </div>
+            <div class="content">
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #FA4616;"></div>
+                        <span>Regular Course</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #28a745;"></div>
+                        <span>Foundation</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #dc3545;"></div>
+                        <span>Circular</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #ffc107;"></div>
+                        <span>Missing</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #6f42c1;"></div>
+                        <span>Duplicate / Reused</span>
+                    </div>
+                    <div class="legend-item" style="font-size: 12px; color: #666;">
+                        💡 Use sliders to zoom, drag to pan; mouse wheel scrolls the main panel
+                    </div>
+                </div>
+                <div id="tree-action-bar" style="display:flex; flex-direction:column; gap:12px; margin-bottom:20px;">
+                    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                        <button id="toggle-duplicates" class="degree-btn" style="width:auto; padding: 10px 14px;">Hide Duplicates</button>
+                        <button id="toggle-selection-ui" class="degree-btn" style="width:auto; padding: 10px 14px;">Hide Selections</button>
+                    </div>
+                    <div id="tree-slider-controls" style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+                        <label style="display:flex; flex-direction:column; font-size:13px; gap:4px; color:#0021A5;">
+                            Pan X: <span id="translate-x-value">0</span>
+                            <input id="translate-x-slider" type="range" min="-1500" max="1500" step="20" value="0" style="width:200px;">
+                        </label>
+                        <label style="display:flex; flex-direction:column; font-size:13px; gap:4px; color:#0021A5;">
+                            Pan Y: <span id="translate-y-value">0</span>
+                            <input id="translate-y-slider" type="range" min="-1500" max="1500" step="20" value="0" style="width:200px;">
+                        </label>
+                        <label style="display:flex; flex-direction:column; font-size:13px; gap:4px; color:#0021A5;">
+                            Scale: <span id="scale-value">1.00</span>
+                            <input id="scale-slider" type="range" min="0.1" max="4" step="0.05" value="1" style="width:200px;">
+                        </label>
+                        <button id="reset-transform" class="degree-btn" style="width:auto; padding: 10px 14px;">Reset Scale</button>
+                    </div>
+                </div>
+                <div id="tree-stats" class="tree-stats" style="display: none;">
+                    <h3>Tree Statistics</h3>
+                    <div>
+                        <span class="stat-item">
+                            <span class="stat-label">Total Courses:</span>
+                            <span id="stat-total">0</span>
+                        </span>
+                        <span class="stat-item">
+                            <span class="stat-label">Max Depth:</span>
+                            <span id="stat-depth">0</span>
+                        </span>
+                        <span class="stat-item">
+                            <span class="stat-label">Prerequisites:</span>
+                            <span id="stat-prereqs">0</span>
+                        </span>
+                    </div>
+                </div>
+                <div id="tree-container">
+                    <div class="loading">Select a course or degree template to view prerequisite tree</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        let allCourses = [];
+        let currentTree = null;
+        let currentZoom = null;
+        let currentSvg = null;
+        let currentTransform = null;
+        let selectedCourses = new Set();
+        let degreePanelVisible = true;
+        let sidebarVisible = true;
+        let duplicatesHidden = false;
+        let selectionUIVisible = true;
+        
+        function updateSelectedCoursesPanel() {
+            const panel = document.getElementById('selected-courses-panel');
+            const list = document.getElementById('selected-courses-list');
+            const selectedArray = Array.from(selectedCourses);
+            if (selectedArray.length === 0) {
+                panel.style.display = 'none';
+                list.innerHTML = '';
+                return;
+            }
+            panel.style.display = 'block';
+            list.innerHTML = selectedArray.map(code => `<span style="display:inline-block; margin:4px 6px 4px 0; padding:6px 10px; border:1px solid #0021A5; border-radius:999px; background:#e9f1ff; color:#0021A5;">${code}</span>`).join('');
+        }
+        
+        function toggleCourseSelection(courseCode, item) {
+            if (selectedCourses.has(courseCode)) {
+                selectedCourses.delete(courseCode);
+                item.classList.remove('selected');
+            } else {
+                selectedCourses.add(courseCode);
+                item.classList.add('selected');
+            }
+            updateSelectedCoursesPanel();
+        }
+        
+        async function loadDepartments() {
+            const response = await fetch('/api/departments');
+            const departments = await response.json();
+            const select = document.getElementById('department');
+            departments.forEach(dept => {
+                const option = document.createElement('option');
+                option.value = dept;
+                option.textContent = dept;
+                select.appendChild(option);
+            });
+        }
+        
+        async function loadDegreeTemplates() {
+            const response = await fetch('/api/degree-templates');
+            const templates = await response.json();
+            const container = document.getElementById('degree-buttons-container');
+            container.innerHTML = '';
+            
+            Object.keys(templates).forEach(degree => {
+                const btn = document.createElement('button');
+                btn.className = 'degree-btn';
+                btn.textContent = degree;
+                btn.onclick = () => loadDegreeTree(degree);
+                container.appendChild(btn);
+            });
+        }
+        
+        async function loadCourses(search = '', department = '') {
+            const params = new URLSearchParams({ search, department });
+            const response = await fetch(`/api/courses?${params}`);
+            const courses = await response.json();
+            allCourses = courses;
+            displayCourses(courses);
+        }
+        
+        function displayCourses(courses) {
+            const list = document.getElementById('course-list');
+            list.innerHTML = '';
+            
+            courses.slice(0, 50).forEach(course => {
+                const li = document.createElement('li');
+                li.className = 'course-item';
+                if (selectedCourses.has(course.coursecode)) {
+                    li.classList.add('selected');
+                }
+                li.innerHTML = `
+                    <span class="course-code">${course.coursecode}</span>
+                    <span class="course-name">${course.name}</span>
+                `;
+                li.onclick = () => toggleCourseSelection(course.coursecode, li);
+                li.ondblclick = () => loadTree(course.coursecode);
+                list.appendChild(li);
+            });
+        }
+        
+        async function loadTree(courseCode) {
+            document.getElementById('tree-container').innerHTML = '<div class="loading">Loading tree...</div>';
+            
+            const response = await fetch(`/api/tree/${courseCode}`);
+            const tree = await response.json();
+            currentTree = tree;
+            
+            displayTree(tree);
+        }
+        
+        async function loadSelectedCourses() {
+            const selectedArray = Array.from(selectedCourses);
+            if (selectedArray.length === 0) {
+                alert('Select one or more courses first.');
+                return;
+            }
+            document.getElementById('tree-container').innerHTML = '<div class="loading">Loading selected courses...</div>';
+            const params = new URLSearchParams({ codes: selectedArray.join(',') });
+            const response = await fetch(`/api/forest?${params}`);
+            const tree = await response.json();
+            currentTree = tree;
+            displayTree(tree);
+        }
+        
+        async function loadDegreeTree(degreeName) {
+            document.getElementById('tree-container').innerHTML = '<div class="loading">Loading degree tree...</div>';
+            
+            const response = await fetch(`/api/degree-tree/${encodeURIComponent(degreeName)}`);
+            const data = await response.json();
+            
+            displayDegreeTree(data);
+        }
+        
+        function displayDegreeTree(data) {
+            currentTree = data.tree;
+            const container = document.getElementById('tree-container');
+            container.innerHTML = `<div style="padding: 20px; color: #0021A5;"><h2 style="margin:0;">${data.degree}</h2><p style="margin:8px 0 0; opacity:0.8;">${data.description}</p></div><div id="degree-tree-root" style="height: calc(100% - 92px); min-height: 520px; border-top: 1px solid #dee2e6;"></div>`;
+            const visibleTree = getVisibleTree(data.tree);
+            if (!visibleTree) {
+                document.getElementById('degree-tree-root').innerHTML = '<div class="loading">No nodes to display.</div>';
+                document.getElementById('tree-stats').style.display = 'none';
+                return;
+            }
+            drawTree(visibleTree, '#degree-tree-root');
+            displayStats(visibleTree);
+        }
+        
+        function displayStats(tree) {
+            const statsDiv = document.getElementById('tree-stats');
+            statsDiv.style.display = 'block';
+            
+            const uniqueCodes = new Set();
+            let maxDepth = 0;
+            let totalPrereqs = 0;
+            
+            function traverse(node) {
+                if (!node || !node.code) return;
+                if (!(node.is_root && node.depth === 0)) {
+                    uniqueCodes.add(node.code);
+                }
+                maxDepth = Math.max(maxDepth, node.depth || 0);
+                if (node.prerequisites) {
+                    totalPrereqs += node.prerequisites.length;
+                    node.prerequisites.forEach(traverse);
+                }
+            }
+            traverse(tree);
+            
+            document.getElementById('stat-total').textContent = uniqueCodes.size;
+            document.getElementById('stat-depth').textContent = maxDepth;
+            document.getElementById('stat-prereqs').textContent = totalPrereqs;
+        }
+        
+        function getVisibleTree(tree) {
+            if (!tree) return null;
+            if (duplicatesHidden && (tree.is_duplicate || tree.is_duplicate_group)) {
+                return null;
+            }
+            const copy = { ...tree };
+            if (tree.prerequisites) {
+                copy.prerequisites = tree.prerequisites
+                    .map(getVisibleTree)
+                    .filter(Boolean);
+            }
+            return copy;
+        }
+
+        function syncSliders(transform) {
+            const xSlider = document.getElementById('translate-x-slider');
+            const ySlider = document.getElementById('translate-y-slider');
+            const scaleSlider = document.getElementById('scale-slider');
+            const xValue = document.getElementById('translate-x-value');
+            const yValue = document.getElementById('translate-y-value');
+            const scaleValue = document.getElementById('scale-value');
+            if (xSlider && ySlider && scaleSlider && xValue && yValue && scaleValue) {
+                xSlider.value = Math.round(transform.x);
+                ySlider.value = Math.round(transform.y);
+                scaleSlider.value = transform.k.toFixed(2);
+                xValue.textContent = xSlider.value;
+                yValue.textContent = ySlider.value;
+                scaleValue.textContent = Number(scaleSlider.value).toFixed(2);
+            }
+        }
+
+        function applyTransformFromSliders() {
+            if (!currentZoom || !currentSvg) return;
+            const x = Number(document.getElementById('translate-x-slider').value);
+            const y = Number(document.getElementById('translate-y-slider').value);
+            const k = Number(document.getElementById('scale-slider').value);
+            currentTransform = d3.zoomIdentity.translate(x, y).scale(k);
+            currentSvg.transition().duration(100).call(currentZoom.transform, currentTransform);
+        }
+
+        function displayTree(tree) {
+            currentTree = tree;
+            const visibleTree = getVisibleTree(tree);
+            const container = document.getElementById('tree-container');
+            container.innerHTML = '';
+            if (!visibleTree) {
+                container.innerHTML = '<div class="loading">No nodes to display.</div>';
+                document.getElementById('tree-stats').style.display = 'none';
+                return;
+            }
+            drawTree(visibleTree, '#tree-container');
+            displayStats(visibleTree);
+        }
+        
+        function drawTree(treeData, containerSelector) {
+            const container = d3.select(containerSelector);
+            const containerNode = container.node();
+            const width = containerNode.clientWidth || 900;
+            const height = containerNode.clientHeight || 600;
+            
+            const controls = container.append('div')
+                .attr('class', 'zoom-controls');
+            
+            const zoomInBtn = controls.append('button')
+                .attr('class', 'zoom-btn')
+                .attr('title', 'Zoom In')
+                .text('+');
+            
+            const zoomOutBtn = controls.append('button')
+                .attr('class', 'zoom-btn')
+                .attr('title', 'Zoom Out')
+                .text('−');
+            
+            const resetBtn = controls.append('button')
+                .attr('class', 'zoom-btn')
+                .attr('title', 'Reset View')
+                .html('⟲');
+
+            const fullscreenBtn = controls.append('button')
+                .attr('class', 'zoom-btn')
+                .attr('title', 'Fullscreen')
+                .html('⛶');
+
+            const transformInfo = controls.append('div')
+                .attr('class', 'transform-info')
+                .text('x: 0, y: 0, scale: 1.00');
+            
+            const treeLayout = d3.tree()
+                .separation((a, b) => (a.parent == b.parent ? 2.5 : 3.5))
+                .nodeSize([80, 200]);
+
+            const root = d3.hierarchy(treeData, d => d.prerequisites);
+            treeLayout(root);
+            const descendants = root.descendants();
+            const minY = d3.min(descendants, d => d.y);
+            const maxY = d3.max(descendants, d => d.y);
+            const minX = d3.min(descendants, d => d.x);
+            const maxX = d3.max(descendants, d => d.x);
+            const requiredWidth = Math.max(width, maxY - minY + 300);
+            const requiredHeight = Math.max(height, maxX - minX + 150);
+
+            const svg = container.append('svg')
+                .attr('width', requiredWidth)
+                .attr('height', requiredHeight);
+            
+            const zoom = d3.zoom()
+                .scaleExtent([0.1, 4])
+                .on('zoom', (event) => {
+                    g.attr('transform', event.transform);
+                    updateTransformInfo(event.transform);
+                });
+            
+            svg.call(zoom);
+            currentZoom = zoom;
+            currentSvg = svg;
+            
+            const g = svg.append('g');
+
+            function updateTransformInfo(transform) {
+                transformInfo.text(`x: ${Math.round(transform.x)}, y: ${Math.round(transform.y)}, scale: ${transform.k.toFixed(2)}`);
+                syncSliders(transform);
+            }
+            
+            const initialTransform = d3.zoomIdentity
+                .translate(width / 2, 50)
+                .scale(0.8);
+            
+            svg.call(zoom.transform, initialTransform);
+            currentTransform = initialTransform;
+            updateTransformInfo(initialTransform);
+            
+            g.selectAll('.link')
+                .data(root.links())
+                .enter()
+                .append('path')
+                .attr('class', 'link')
+                .attr('d', d3.linkHorizontal()
+                    .x(d => d.y - width / 2)
+                    .y(d => d.x - 50));
+            
+            const node = g.selectAll('.node')
+                .data(root.descendants())
+                .enter()
+                .append('g')
+                .attr('class', d => {
+                    let classes = 'node';
+                    if (d.data.is_root) classes += ' root';
+                    if (d.data.is_foundation) classes += ' foundation';
+                    if (d.data.is_circular) classes += ' circular';
+                    if (d.data.is_missing) classes += ' missing';
+                    if (d.data.is_duplicate) classes += ' duplicate';
+                    return classes;
+                })
+                .attr('transform', d => `translate(${d.y - width/2},${d.x - 50})`)
+                .on('click', (event, d) => {
+                    event.stopPropagation();
+                    if (d.data.is_root || d.data.is_duplicate || d.data.is_circular || d.data.is_missing) {
+                        return;
+                    }
+                    loadTree(d.data.code);
+                });
+            
+            node.append('circle')
+                .attr('r', 6);
+            
+            node.append('text')
+                .attr('dy', -10)
+                .attr('text-anchor', 'middle')
+                .text(d => d.data.code)
+                .style('fill', '#0021A5');
+            
+            node.append('text')
+                .attr('dy', 20)
+                .attr('text-anchor', 'middle')
+                .style('font-size', '10px')
+                .style('fill', '#666')
+                .text(d => d.data.name ? d.data.name.substring(0, 20) + (d.data.name.length > 20 ? '...' : '') : '');
+            
+            zoomInBtn.on('click', () => {
+                svg.transition().duration(300).call(zoom.scaleBy, 1.3);
+            });
+            
+            zoomOutBtn.on('click', () => {
+                svg.transition().duration(300).call(zoom.scaleBy, 0.7);
+            });
+            
+            fullscreenBtn.on('click', async () => {
+                const element = container.node();
+                try {
+                    if (!document.fullscreenElement) {
+                        await element.requestFullscreen();
+                        element.classList.add('fullscreen');
+                        fullscreenBtn.text('⤢');
+                    } else {
+                        await document.exitFullscreen();
+                    }
+                } catch (err) {
+                    console.warn('Fullscreen request failed', err);
+                }
+            });
+
+            document.addEventListener('fullscreenchange', () => {
+                const element = container.node();
+                if (!document.fullscreenElement) {
+                    element.classList.remove('fullscreen');
+                    fullscreenBtn.text('⛶');
+                }
+            });
+
+            resetBtn.on('click', () => {
+                svg.transition().duration(500).call(zoom.transform, initialTransform);
+            });
+        }
+        
+        document.getElementById('search').addEventListener('input', (e) => {
+            const search = e.target.value;
+            const dept = document.getElementById('department').value;
+            loadCourses(search, dept);
+        });
+        
+        document.getElementById('department').addEventListener('change', (e) => {
+            const search = document.getElementById('search').value;
+            const dept = e.target.value;
+            loadCourses(search, dept);
+        });
+        
+        document.getElementById('show-selected-btn').addEventListener('click', loadSelectedCourses);
+        document.getElementById('clear-selection-btn').addEventListener('click', () => {
+            selectedCourses.clear();
+            updateSelectedCoursesPanel();
+            displayCourses(allCourses);
+        });
+        document.getElementById('toggle-degree-panel').addEventListener('click', () => {
+            degreePanelVisible = !degreePanelVisible;
+            const panelContent = document.getElementById('degree-panel-content');
+            panelContent.classList.toggle('hidden', !degreePanelVisible);
+            document.getElementById('toggle-degree-panel').textContent = degreePanelVisible ? 'Hide' : 'Show';
+        });
+        document.getElementById('toggle-sidebar').addEventListener('click', () => {
+            sidebarVisible = !sidebarVisible;
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.toggle('hidden', !sidebarVisible);
+            document.getElementById('toggle-sidebar').textContent = sidebarVisible ? 'Hide Sidebar' : 'Show Sidebar';
+        });
+        document.getElementById('toggle-duplicates').addEventListener('click', () => {
+            duplicatesHidden = !duplicatesHidden;
+            document.getElementById('toggle-duplicates').textContent = duplicatesHidden ? 'Show Duplicates' : 'Hide Duplicates';
+            if (currentTree) {
+                if (document.getElementById('degree-tree-root')) {
+                    const visibleTree = getVisibleTree(currentTree);
+                    const root = document.getElementById('degree-tree-root');
+                    root.innerHTML = '';
+                    if (visibleTree) {
+                        drawTree(visibleTree, '#degree-tree-root');
+                        displayStats(visibleTree);
+                    } else {
+                        root.innerHTML = '<div class="loading">No nodes to display.</div>';
+                        document.getElementById('tree-stats').style.display = 'none';
+                    }
+                } else {
+                    displayTree(currentTree);
+                }
+            }
+        });
+        document.getElementById('toggle-selection-ui').addEventListener('click', () => {
+            selectionUIVisible = !selectionUIVisible;
+            const section = document.getElementById('course-selection-area');
+            section.classList.toggle('hidden', !selectionUIVisible);
+            document.getElementById('toggle-selection-ui').textContent = selectionUIVisible ? 'Hide Selections' : 'Show Selections';
+        });
+        document.getElementById('translate-x-slider').addEventListener('input', () => {
+            document.getElementById('translate-x-value').textContent = document.getElementById('translate-x-slider').value;
+            applyTransformFromSliders();
+        });
+        document.getElementById('translate-y-slider').addEventListener('input', () => {
+            document.getElementById('translate-y-value').textContent = document.getElementById('translate-y-slider').value;
+            applyTransformFromSliders();
+        });
+        document.getElementById('scale-slider').addEventListener('input', () => {
+            document.getElementById('scale-value').textContent = Number(document.getElementById('scale-slider').value).toFixed(2);
+            applyTransformFromSliders();
+        });
+        document.getElementById('reset-transform').addEventListener('click', () => {
+            const scaleSlider = document.getElementById('scale-slider');
+            scaleSlider.value = 1;
+            document.getElementById('scale-value').textContent = '1.00';
+            applyTransformFromSliders();
+        });
+        
+        updateSelectedCoursesPanel();
+        loadDepartments();
+        loadDegreeTemplates();
+        loadCourses();
+    </script>
+</body>
+</html>
