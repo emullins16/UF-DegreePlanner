@@ -57,8 +57,7 @@ DEGREE_TEMPLATES = {
         'description': 'ISE Core Curriculum'
     },
     'Materials Science & Engineering': {
-        'core_courses': ['EMA 3010', 'EMA 3011', 'EMA 3050', 'EMA 3066', 'EMA 3413', 
-                       'EMA 4120', 'EMA 4223', 'EMA 4314', 'EMA 4714'],
+        'core_courses': ['EMA 3013C', 'EMA 4714'],
         'description': 'MSE Core Curriculum'
     }
 }
@@ -201,6 +200,16 @@ def get_tree(course_code):
 @app.route('/api/degree-templates')
 def get_degree_templates():
     return jsonify(DEGREE_TEMPLATES)
+
+@app.route('/api/forest')
+def get_forest():
+    codes_param = request.args.get('codes', '')
+    if not codes_param:
+        return jsonify({'error': 'No course codes provided'}), 400
+    
+    course_codes = [c.strip() for c in codes_param.split(',') if c.strip()]
+    tree = build_forest(course_codes)
+    return jsonify(tree)
 
 @app.route('/api/degree-tree/<degree_name>')
 def get_degree_tree(degree_name):
