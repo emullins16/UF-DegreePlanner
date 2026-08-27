@@ -7,57 +7,49 @@ app = Flask(__name__)
 # Degree templates data
 DEGREE_TEMPLATES = {
     'Computer Science': {
-        'core_courses': ['COP 3502C', 'COP 3503C', 'COT 3100', 'COP 3530', 
-                       'CDA 3101', 'COP 4600', 'CEN 3031'],
+        'core_courses': ['COP 4600', 'CEN 3031'],
         'description': 'CS Core Curriculum'
     },
     'Computer Engineering': {
-        'core_courses': ['EEL 3111C', 'EEL 3701C', 'COP 3530', 'EEL 4712C', 
-                       'CDA 3101', 'COP 4600', 'CEN 4907C'],
+        'core_courses': ['EEL 4712C', 'COP 4600', 'CEN 4908C'],
         'description': 'CpE Core Curriculum'
     },
     'Electrical Engineering': {
-        'core_courses': ['EEL 3111C', 'EEL 3112', 'EEL 3701C', 'EEL 3135', 
-                       'EEE 3308C', 'EEL 4712C', 'EEL 3923C'],
+        'core_courses': ['EEL 3850', 'EEL 3135', 'EEL 4837', 'EEL 3701C', 'EEL 4924C'],
         'description': 'EE Core Curriculum'
     },
     'Biomedical Engineering': {
-        'core_courses': ['BME 1008', 'BME 3060', 'BME 3053C', 'BME 3101', 
-                       'BME 4311', 'BME 4503C', 'BME 4882', 'BME 4883'],
+        'core_courses': ['BME 1008', 'BME 4531', 'BME 4409', 'BME 3101', 
+                        'BME 4621', 'BME 4503C', 'BME 4883'],
         'description': 'BME Core Curriculum'
     },
      'Mechanical Engineering': {
-        'core_courses': ['EML 2023', 'EML 3100', 'EGM 3520', 'EGN 3353C', 
-                       'EML 4140', 'EML 4312', 'EML 4501', 'EML 4502'],
-        'description': 'ME Core Curriculum'
+        'core_courses': ['EML 2023', 'EML 4502'],
+        'description': 'ME Core Curriculum' 
     },
     'Aerospace Engineering': {
-        'core_courses': ['EAS 2011', 'EAS 4101', 'EAS 4200', 'EAS 4300', 
-                       'EAS 4510', 'EAS 4700', 'EAS 4710'],
+        'core_courses': ['EAS 4200', 'EAS 4300', 'EAS 4700', 'EAS 4710'],
         'description': 'AE Core Curriculum'
     },
     'Chemical Engineering': {
-        'core_courses': ['ECH 3023', 'ECH 3101', 'ECH 3264', 'ECH 4123', 
-                       'ECH 4403', 'ECH 4504', 'ECH 4644'],
+        'core_courses': ['ECH 4714', 'ECH 4323', 'ECH 4644'],
         'description': 'ChE Core Curriculum'
     },
     'Civil Engineering': {
-        'core_courses': ['CGN 3421', 'CES 3102', 'CWR 3201', 'CEG 4011', 
+        'core_courses': ['CGN 3421', 'CES 3102', 'CWR 3201', 'CEG 4011', 'CGN 3421' 
                        'CES 4605', 'CES 4702', 'CGN 4806'],
         'description': 'CE Core Curriculum'
     },
     'Environmental Engineering': {
-        'core_courses': ['ENV 3001', 'ENV 3000', 'ENV 4453', 'ENV 4454', 
-                       'ENV 4009', 'ENV 4514C', 'ENV 4892', 'ENV 4893'],
+        'core_courses': ['ENV 4893', 'CWR 4202', 'ENV 4545', 'ENV 4041C', 'ENV 4601', 'EES 3206', 'CGN 3501C'],
         'description': 'EnvE Core Curriculum'
     },
     'Industrial & Systems Engineering': {
-        'core_courses': ['ESI 3215C', 'ESI 3327C', 'ESI 3312', 'ESI 4313', 
-                       'ESI 4221C', 'EIN 3354', 'EIN 4335'],
+        'core_courses': ['EIN 4335'],
         'description': 'ISE Core Curriculum'
     },
     'Materials Science & Engineering': {
-        'core_courses': ['EMA 3013C', 'EMA 4714'],
+        'core_courses': ['EMA 3013C', 'EMA 4714', 'EMA 4935'],
         'description': 'MSE Core Curriculum'
     }
 }

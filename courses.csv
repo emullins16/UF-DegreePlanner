@@ -4,6 +4,9 @@ MAC 2311,Calculus with Analytic Geometry 1,Mathematics,MAC 1147,
 MAC 2312,Calculus with Analytic Geometry 2,Mathematics,MAC 2311,
 MAC 2313,Calculus with Analytic Geometry 3,Mathematics,MAC 2312,
 MAP 2302,Elementary Differential Equations,Mathematics,MAC 2313,
+MAP 4305, Differential Equations for Engineers and Physical Scientists,Mathematics,MAP 2302;MAS 3114,
+MAS 3114, Computational Linear Algebra,Mathematics,MAC 2312,
+MAS 4105, Linear Algebra 1, Mathematics,MAC 2313; MHF 3202,
 BSC 2010,Integrated Principles of Biology 1,Biology,,
 BSC 2011,Integrated Principles of Biology 2,Biology,BSC 2010,
 CHM 2045,General Chemistry 1,Chemistry,MAC 1147,
@@ -18,10 +21,14 @@ CHM 2210,Organic Chemistry 1,Chemistry,CHM 2046,
 CHM 2211,Organic Chemistry 2,Chemistry,CHM 2210,
 CHM 3217,Orgoanic/Biochemistry for Engineers,Chemistry,CHM 2046,
 CHM 3218,Organic/Biochemistry for Engineers 2,Chemistry,CHM 3217,
-PHY 2048,General Physics with Calculus 1,Physics,MAC 2313,
-PHY 2049,General Physics with Calculus 2,Physics,PHY 2048,
+PHY 2048,General Physics with Calculus 1,Physics,MAC 2312,
+PHY 2049,General Physics with Calculus 2,Physics,PHY 2048; MAC 2313,
 PHY 2048L,General Physics with Calculus 1 Laboratory,Physics,PHY 2048,
 PHY 2049L,General Physics with Calculus 2 Laboratory,Physics,PHY 2049,
+PHY 2060, Enriched Physics with Calculus 1, Physics, MAC 2312
+PHY 2061, Enriched Physics with Calculus 2, Physics, PHY 2060
+PCB 3713C, Cellular and Systems Physiology, Physiology, BSC 2010; CHM 2046; PHY 2049,
+ENC 3246, Professional Communication for Engineers, Communication,
 ABE 2012C,Introduction to Biological Engineering,Agricultural & Biological Eng.,MAC 2311,
 ABE 3000C,Applications in Biological Engineering,Agricultural & Biological Eng.,BSC 2010,
 ABE 3212C,Land and Water Resources Engineering,Agricultural & Biological Eng.,ENV 3040C; CGN 3421; COP 2271; COP 2271L; MAP 2302,
@@ -54,7 +61,7 @@ BME 1008,Introduction to Biomedical Engineering,Biomedical Engineering,,
 BME 1930,Special Topics in Biomedical Engineering,Biomedical Engineering,,
 BME 2202,Engineering Statics and Dynamics in Biological Systems,Biomedical Engineering,PHY 2049; MAC 2313,
 BME 2402,Introduction to Biomolecular Engineering,Chemical Engineering,CHM 2045; CHM 2095; CHM 2050,CHM 2046; CHM 2096; CHM 2051
-BME 3012,Clinically-Inspired Engineering Design,Biomedical Engineering,BME 3060; PCB 3713C,BME 3101; EGM 2511
+BME 3012,Clinically-Inspired Engineering Design,Biomedical Engineering,BME 3060; PCB 3713C;BME 3101, EGM 2511
 BME 3053C,Computer Applications for BME,Biomedical Engineering,COP 2271; COP 2271L; MAC 2312,
 BME 3060,Biomedical Fundamentals,Biomedical Engineering,CHM 2046; CHM 2096; MAC 2313,PHY 2049; MAP 2302; BME 1008
 BME 3101,Biomedical Materials,Biomedical Engineering,BME 3060; CHM 3217,
@@ -100,7 +107,7 @@ CCE 4015,Civil Engineering Estimating,Civil & Coastal Engineering,CGN 4160,
 CCE 4204,"Construction Equipment, Methods and Management",Civil & Coastal Engineering,,CGN 4101
 CCE 4521C,Engineering and Construction Analytics using BIM,Civil & Coastal Engineering,EGM 2511,
 CCE 4811,Construction Engineering Design,Civil & Coastal Engineering,CGN 4160; EIN 3354,
-CDA 3101,Introduction to Computer Organization,Computer & Info. Science & Eng.,MAC 2233; MAC 2311; MAC 3472; COT 3100,
+CDA 3101,Introduction to Computer Organization,Computer & Info. Science & Eng.,MAC 2311; COT 3100,
 CDA 4102,Computer Architecture,Computer & Info. Science & Eng.,CDA 3101; COP 3530,
 CDA 4324C,Cyber-physical System Security,Computer & Info. Science & Eng.,COP 3530,
 CDA 4630,Embedded Systems,Computer & Info. Science & Eng.,CDA 3101,
@@ -116,7 +123,7 @@ CEN 4722,User Experience Design,Computer & Info. Science & Eng.,COP 3530,
 CEN 4725,Natural User Interaction,Computer & Info. Science & Eng.,COP 3530,
 CEN 4730,Human-Centered Input Recognition Algorithms,Computer & Info. Science & Eng.,COP 3530,
 CEN 4907C,Computer Engineering Design 1,Computer & Info. Science & Eng.,CEN 3031,COP 4600
-CEN 4908C,Computer Engineering Design 2,Computer & Info. Science & Eng.,CEN 3907C,
+CEN 4908C,Computer Engineering Design 2,Computer & Info. Science & Eng.,CEN 4907C
 CEN 4914,Computer and Information Science and Engineering Design 2,Computer & Info. Science & Eng.,CEN 3913,
 CES 3102,Mechanics of Engineering Structures,Civil & Coastal Engineering,EGM 3520,
 CES 4605,Analysis and Design in Steel,Civil & Coastal Engineering,CES 3102; CGN 3501C,
@@ -170,8 +177,8 @@ COP 3013,Programming Language Survey,Computer & Info. Science & Eng.,MAC 1147; C
 COP 3275,Computer Programming Using C,Computer & Info. Science & Eng.,MAC 1147,
 COP 3502C,Programming Fundamentals 1,Computer & Info. Science & Eng.,,MAC 2311
 COP 3503C,Programming Fundamentals 2,Computer & Info. Science & Eng.,COP 3502C; MAC 2311,
-COP 3504C,Advanced Programming Fundamentals for CIS Majors,Computer & Info. Science & Eng.,MAC 2311; MAC 3472,
-COP 3530,Data Structures and Algorithm,Computer & Info. Science & Eng.,COT 3100; MAC 2234; MAC 2312; MAC 3473,
+COP 3504C,Advanced Programming Fundamentals for CIS Majors,Computer & Info. Science & Eng.,MAC 2311;
+COP 3530,Data Structures and Algorithm,Computer & Info. Science & Eng.,COT 3100; MAC 2312;
 COP 4020,Programming Language Concepts,Computer & Info. Science & Eng.,COP 3530,
 COP 4331,Object-oriented Programming,Computer & Info. Science & Eng.,COP 3530,
 COP 4533,Algorithm Abstraction and Design,Computer & Info. Science & Eng.,COP 3530,
@@ -179,7 +186,7 @@ COP 4554,Programming Language Inquiry,Computer & Info. Science & Eng.,COP 3503C,
 COP 4600,Operating Systems,Computer & Info. Science & Eng.,CDA 3101; COP 3530,
 COP 4620,Translators and Translator Writing Systems,Computer & Info. Science & Eng.,COP 3530,
 COP 4720,Information and Database Systems 2,Computer & Info. Science & Eng.,CIS 4301; COP 3530,
-COT 3100,Applications of Discrete Structures,Computer & Info. Science & Eng.,MAC 2311; MAC 3472; COP 3502C,COP 3504; COP 3503
+COT 3100,Applications of Discrete Structures,Computer & Info. Science & Eng.,MAC 2311; COP 3502C,COP 3504; COP 3503
 COT 3502,Computational Methods for Chemical Engineers,Chemical Engineering,COP 2273; MAP 2302; MAC 2313,
 COT 4501,Numerical Analysis: a Computational Approach,Computer & Info. Science & Eng.,MAS 3114,
 CWR 3201,Hydrodynamics,Civil & Coastal Engineering,MAP 2302; EGM 2511,
@@ -314,7 +321,7 @@ EES 3206,Environmental Chemistry,Environmental Eng. Sciences,CHM 2046; CHM 2096;
 EES 4005C,Ecological Engineering,Environmental Eng. Sciences,CHM 2046; CHM 2096,EES 4203
 EES 4050,Environmental Planning and Design,Environmental Eng. Sciences,,
 EES 4102,Wastewater Microbiology,Environmental Eng. Sciences,CHM 2046,
-EES 4201,Water Chemistry,Environmental Eng. Sciences,CHM 2046; CHM 2096; MAC 2311; MAC 2233,
+EES 4201,Water Chemistry,Environmental Eng. Sciences,CHM 2046; CHM 2096; MAC 2311;
 EES 4203,Phase Partitioning in the Environment,Environmental Eng. Sciences,CHM 2046; CHM 2096,
 EGM 2511,Engineering Mechanics: Statics,Mechanical & Aerospace Engineering,PHY 2048,MAC 2313
 EGM 3344,Introduction to Numerical Methods of Engineering Analysis,Mechanical & Aerospace Engineering,MAC 2313; COP 2271,MAP 2302
@@ -480,7 +487,7 @@ ESI 3327C,Matrix and Numerical Methods in Systems Engineering,Industrial & Syste
 ESI 4221C,Industrial Quality Control,Industrial & Systems Engineering,ESI 3215C,
 ESI 4313,Operations Research 2,Industrial & Systems Engineering,ESI 3327C; ESI 3215C,
 ESI 4317,Advanced Topics in Operations Research,Industrial & Systems Engineering,ESI 3312; ESI 4313,
-ESI 4356,Decision Support Systems for Industrial and Systems Engineers,Industrial & Systems Engineering,,ESI 3312
+ESI 4356,Decision Support Systems for Industrial and Systems Engineers,Industrial & Systems Engineering,ESI 3312
 ESI 4523,Industrial Systems Simulation,Industrial & Systems Engineering,ESI 3215C,
 ESI 4610,Introduction to Data Analytics,Industrial & Systems Engineering,ESI 3215C,
 ESI 4611,Advanced Data Analytics,Industrial & Systems Engineering,ESI 4610,

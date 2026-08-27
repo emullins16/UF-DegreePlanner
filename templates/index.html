@@ -440,7 +440,7 @@
                 </div>
                 <div id="tree-action-bar" style="display:flex; flex-direction:column; gap:12px; margin-bottom:20px;">
                     <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                        <button id="toggle-duplicates" class="degree-btn" style="width:auto; padding: 10px 14px;">Hide Duplicates</button>
+                        <button id="toggle-duplicates" class="degree-btn" style="width:auto; padding: 10px 14px;">Show Duplicates</button>
                         <button id="toggle-selection-ui" class="degree-btn" style="width:auto; padding: 10px 14px;">Hide Selections</button>
                     </div>
                     <div id="tree-slider-controls" style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
@@ -491,7 +491,7 @@
         let selectedCourses = new Set();
         let degreePanelVisible = true;
         let sidebarVisible = true;
-        let duplicatesHidden = false;
+        let duplicatesHidden = true;
         let selectionUIVisible = true;
         
         function updateSelectedCoursesPanel() {
